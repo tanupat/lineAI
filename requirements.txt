@@ -12,6 +12,11 @@ openai>=1.12.0
 google-generativeai>=0.4.0
 ollama>=0.1.6
 
+# Torch CPU-only (Prioritize CPU wheels for Vercel/Docker)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.0.0
+torchvision>=0.15.0
+
 # RAG and Vector Store
 langchain>=0.1.6
 langchain-core>=0.1.0
