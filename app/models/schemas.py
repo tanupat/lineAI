@@ -51,6 +51,7 @@ class RAGQueryResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     providers: Dict[str, Any]
+    env_status: Dict[str, bool] = Field(..., description="Status of critical environment variables")
 
 
 class ProviderModelsResponse(BaseModel):

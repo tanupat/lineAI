@@ -54,10 +54,24 @@ async def health_check():
     providers = LLMFactory.get_available_providers()
     line_handler = get_line_handler()
     providers["line"] = {"available": line_handler.is_available()}
+    
+    from app.core.config import get_settings
+    settings = get_settings()
+    
+    env_status = {
+        "LINE_CHANNEL_SECRET": bool(settings.line_channel_secret),
+        "LINE_CHANNEL_ACCESS_TOKEN": bool(settings.line_channel_access_token),
+        "OPENAI_API_KEY": bool(settings.openai_api_key),
+        "GOOGLE_API_KEY": bool(settings.google_api_key),
+        "DEEPSEEK_API_KEY": bool(settings.deepseek_api_key),
+        "DATABASE_URL": bool(settings.database_url),
+        "DEBUG": settings.debug
+    }
 
     return HealthResponse(
         status="healthy",
-        providers=providers
+        providers=providers,
+        env_status=env_status
     )
 
 
@@ -284,12 +298,21 @@ async def line_webhook(
     body_str = body.decode("utf-8")
 
     try:
+        # Debug Logging (Sensitive - Remove after fixing)
+        logger.info(f"Received LINE Webhook. Signature: {x_line_signature}")
+        # logger.info(f"Body: {body_str}") # Uncomment to see full body
+
         # Verify signature
         await line_handler.handle_webhook(body_str, x_line_signature)
 
         # Parse and process events
         import json
         data = json.loads(body_str)
+
+        # Handle verification event (empty events list)
+        if not data.get("events"):
+            logger.info("Received verification request (empty events)")
+            return {"status": "ok"}
 
         for event_data in data.get("events", []):
             if event_data.get("type") == "message":
