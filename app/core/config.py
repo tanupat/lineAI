@@ -35,12 +35,12 @@ class Settings(BaseSettings):
 
     # RAG
     embedding_model: str = "all-MiniLM-L6-v2"
-    chroma_persist_dir: str = "./chroma_db"
+    chroma_persist_dir: str = "/tmp/chroma_db"
     chunk_size: int = 1000
     chunk_overlap: int = 200
 
     # Upload
-    upload_dir: str = "./uploads/documents"
+    upload_dir: str = "/tmp/uploads/documents"
     max_file_size: int = 10485760  # 10MB
 
     # Database
