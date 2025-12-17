@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: line_ai_api
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+      - ./chroma_db:/app/chroma_db
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override DB connection for Docker if using Postgres
+      # DATABASE_TYPE: postgresql
+      # DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/line_ai
+      - WATCHFILES_FORCE_POLLING=true
+    depends_on:
+      - db
+    networks:
+      - line_ai_network
+
+  db:
+    image: postgres:15-alpine
+    container_name: line_ai_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=line_ai
+    ports:
+      - "5432:5432"
+    networks:
+      - line_ai_network
+  # Optional: Run Ollama via Docker
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: line_ai_ollama
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   ports:
+  #     - "11434:11434"
+  #   networks:
+  #     - line_ai_network
+
+networks:
+  line_ai_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  ollama_data:

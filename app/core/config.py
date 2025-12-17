@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     upload_dir: str = "./uploads/documents"
     max_file_size: int = 10485760  # 10MB
 
+    # Database
+    database_type: str = "sqlite"  # sqlite or postgresql
+    database_url: str = "sqlite+aiosqlite:///./line_ai.db"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
